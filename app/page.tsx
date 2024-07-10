@@ -101,6 +101,7 @@ export default function Home({
               Sign In
             </SubmitButton>
             <SubmitButton
+              type="button"
               formAction={signUp}
               className="py-2 px-4 text-sm flex rounded-md no-underline bg-inherit hover:bg-gray-200 border border-gray-300 text-black font-semibold justify-center"
               pendingText="Signing Up..."
