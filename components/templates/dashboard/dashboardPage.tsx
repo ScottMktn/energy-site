@@ -4,13 +4,14 @@ import clsx from "@/utils/helpers/clsx";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
 import { SubmitButton } from "../../shared/SubmitButton";
+import { calculateTotalDimensions } from "@/utils/helpers/calculateDimensions";
 
 interface DashboardPageProps {
   user: User;
   initialLayout?: SelectedBatteries[];
 }
 
-interface SelectedBatteries {
+export interface SelectedBatteries {
   id: number;
   quantity: number;
 }
@@ -44,16 +45,10 @@ const DashboardPage = (props: DashboardPageProps) => {
     useState<SelectedBatteries[]>(initialLayout);
 
   const calculateLandDimension = () => {
-    const totalWidth = selectedBatteries.reduce(
-      (acc, selectedBattery) =>
-        acc +
-        BATTERIES.find((battery) => battery.id === selectedBattery.id)!.width *
-          selectedBattery.quantity,
-      0
+    const { width, height } = calculateTotalDimensions(
+      selectedBatteries,
+      BATTERIES
     );
-
-    const height = Math.ceil(totalWidth / 100) * 10;
-    const width = totalWidth > 100 ? 100 : totalWidth;
 
     return `${width} ft x ${height} ft`;
   };
@@ -156,6 +151,7 @@ const DashboardPage = (props: DashboardPageProps) => {
           <div className="w-full flex justify-between items-center text-sm">
             <h2 className="text-2xl font-bold">Battery Selection</h2>
             <button
+              type="button"
               className="underline"
               onClick={() => {
                 setSelectedBatteries((prev) => {
