@@ -5,6 +5,9 @@ import { User } from "@supabase/supabase-js";
 import { useState } from "react";
 import { SubmitButton } from "../../shared/SubmitButton";
 import { calculateTotalDimensions } from "@/utils/helpers/calculateDimensions";
+import { calculateTotalBudget } from "@/utils/helpers/calculateBudget";
+import { calculateTotalEnergy } from "@/utils/helpers/calculateEnergy";
+import { updateBatteries } from "@/utils/helpers/updateBatteries";
 
 interface DashboardPageProps {
   user: User;
@@ -39,7 +42,9 @@ const DEFAULT_LAYOUT: SelectedBatteries[] = [
   },
 ];
 
-const DashboardPage = (props: DashboardPageProps) => {
+const DashboardPage: React.FC<DashboardPageProps> = (
+  props: DashboardPageProps
+) => {
   const { user, initialLayout = DEFAULT_LAYOUT } = props;
   const [selectedBatteries, setSelectedBatteries] =
     useState<SelectedBatteries[]>(initialLayout);
@@ -211,41 +216,7 @@ const DashboardPage = (props: DashboardPageProps) => {
                     onChange={(e) => {
                       const value = parseInt(e.target.value);
                       setSelectedBatteries((prev) => {
-                        const newSelectedBatteries = [...prev];
-                        const index = newSelectedBatteries.findIndex(
-                          (selectedBattery) => selectedBattery.id === battery.id
-                        );
-                        newSelectedBatteries[index] = {
-                          id: battery.id,
-                          quantity: value,
-                        };
-
-                        // ensure that the transformer count is always half of the battery count
-                        const batteryCount = newSelectedBatteries
-                          .filter((selectedBattery) => selectedBattery.id !== 5)
-                          .reduce(
-                            (acc, selectedBattery) =>
-                              acc + selectedBattery.quantity,
-                            0
-                          );
-
-                        const transformerCount =
-                          newSelectedBatteries.find(
-                            (selectedBattery) => selectedBattery.id === 5
-                          )?.quantity || 0;
-
-                        const requiredTransformers = Math.floor(
-                          batteryCount / 2
-                        );
-
-                        if (transformerCount < requiredTransformers) {
-                          newSelectedBatteries[4] = {
-                            id: 5,
-                            quantity: requiredTransformers,
-                          };
-                        }
-
-                        return newSelectedBatteries;
+                        return updateBatteries(prev, battery.id, value);
                       });
                     }}
                     className="border border-gray-300 rounded-md px-2 py-1 w-16"
@@ -275,22 +246,7 @@ const DashboardPage = (props: DashboardPageProps) => {
                   <p>💵</p>
                 </div>
                 <h3 className="text-2xl font-bold">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(
-                    selectedBatteries.length > 0
-                      ? selectedBatteries.reduce(
-                          (acc, selectedBattery) =>
-                            acc +
-                            BATTERIES.find(
-                              (battery) => battery.id === selectedBattery.id
-                            )!.cost *
-                              selectedBattery.quantity,
-                          0
-                        )
-                      : 0
-                  )}
+                  {calculateTotalBudget(selectedBatteries, BATTERIES)}
                 </h3>
               </div>
               <div className="border border-gray-300 rounded-lg p-4 flex flex-col col-span-1 space-y-2">
@@ -308,22 +264,7 @@ const DashboardPage = (props: DashboardPageProps) => {
                   <p>⚡</p>
                 </div>
                 <h3 className="text-2xl font-bold">
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 2,
-                  }).format(
-                    selectedBatteries.length > 0
-                      ? selectedBatteries.reduce(
-                          (acc, selectedBattery) =>
-                            acc +
-                            BATTERIES.find(
-                              (battery) => battery.id === selectedBattery.id
-                            )!.energy *
-                              selectedBattery.quantity,
-                          0
-                        )
-                      : 0
-                  )}{" "}
-                  MWh
+                  {calculateTotalEnergy(selectedBatteries, BATTERIES)} MWh
                 </h3>
               </div>
             </div>
