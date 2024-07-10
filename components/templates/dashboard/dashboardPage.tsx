@@ -1,7 +1,9 @@
 "use client";
 import BATTERIES, { Battery } from "@/components/devices/batteries";
+import clsx from "@/utils/helpers/clsx";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
+import { SubmitButton } from "./submit-button";
 
 interface DashboardPageProps {
   user: User;
@@ -82,13 +84,18 @@ const DashboardPage = (props: DashboardPageProps) => {
       let addedToRow = false;
       for (let i = 0; i < batteryUnits.length; i++) {
         const battery = batteryUnits[i];
+        const colSpan = Math.floor(battery.width / 10);
         if (currentRowWidth + battery.width <= 100) {
           currentRow.push(
             <div
               key={`${battery.id}-${currentRow.length}`}
-              className={`col-span-${
-                battery.width / 10
-              } bg-gray-300 rounded-sm w-full h-8 items-center flex justify-center text-sm`}
+              className={clsx(
+                "rounded-sm h-8 items-center flex justify-center text-sm"
+              )}
+              style={{
+                backgroundColor: battery.color,
+                gridColumn: `span ${colSpan} / span ${colSpan}`,
+              }}
             >
               {battery.shortName}
             </div>
@@ -113,9 +120,9 @@ const DashboardPage = (props: DashboardPageProps) => {
     }
 
     return (
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 w-full">
         {layoutRows.map((row, rowIndex) => (
-          <div key={rowIndex} className="grid grid-cols-10 gap-4">
+          <div key={rowIndex} className="grid grid-cols-10 gap-4 w-full">
             {row}
           </div>
         ))}
@@ -132,13 +139,20 @@ const DashboardPage = (props: DashboardPageProps) => {
       body: JSON.stringify({ userId, layout }),
     });
 
+    // if its a 200, send a success message to the user
+    if (response.status !== 200) {
+      alert("Failed to save session");
+    }
+
+    alert("Successfully saved session");
+
     return response.json();
   };
 
   return (
     <div className="flex flex-col w-full space-y-4">
       <div className="grid grid-cols-8 gap-8 lg:gap-16">
-        <div className="flex flex-col space-y-4 col-span-8 lg:col-span-3">
+        <form className="flex flex-col space-y-4 col-span-8 lg:col-span-3">
           <div className="w-full flex justify-between items-center text-sm">
             <h2 className="text-2xl font-bold">Battery Selection</h2>
             <button
@@ -159,26 +173,35 @@ const DashboardPage = (props: DashboardPageProps) => {
           <div className="w-full rounded-lg space-y-4">
             {BATTERIES.map((battery) => (
               <div key={battery.id} className="flex w-full justify-between">
-                <div className="flex flex-col">
-                  <div className="w-full flex items-center space-x-2">
-                    <p className="font-bold">{battery.name}</p>
-                  </div>
+                <div className="flex items-center space-x-4">
+                  <div
+                    className="rounded-full h-4 w-4"
+                    style={{
+                      backgroundColor: battery.color,
+                    }}
+                  />
+                  <div className="flex flex-col">
+                    <div className="w-full flex items-center space-x-2">
+                      <p className="font-bold">{battery.name}</p>
+                    </div>
 
-                  <div className="flex flex-wrap gap-1 text-gray-600 text-sm items-center">
-                    <p>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(battery.cost)}
-                    </p>
-                    <p>•</p>
-                    <p>
-                      {battery.width} ft x {battery.height} ft
-                    </p>
-                    <p>•</p>
-                    <p>{battery.energy} MWh</p>
+                    <div className="flex flex-wrap gap-1 text-gray-600 text-sm items-center">
+                      <p>
+                        {new Intl.NumberFormat("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        }).format(battery.cost)}
+                      </p>
+                      <p>•</p>
+                      <p>
+                        {battery.width} ft x {battery.height} ft
+                      </p>
+                      <p>•</p>
+                      <p>{battery.energy} MWh</p>
+                    </div>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-4">
                   <input
                     type="number"
@@ -236,15 +259,16 @@ const DashboardPage = (props: DashboardPageProps) => {
             ))}
           </div>
 
-          <button
-            className="py-2 px-4 text-sm flex rounded-md no-underline bg-inherit hover:bg-gray-200 border border-gray-300 text-black font-semibold justify-center"
-            onClick={() => {
+          <SubmitButton
+            pendingText="Saving Changes..."
+            formAction={() => {
               saveSession(user.id, selectedBatteries);
             }}
+            className="py-2 px-4 text-sm flex rounded-md no-underline bg-inherit hover:bg-gray-200 border border-gray-300 text-black font-semibold justify-center"
           >
             Save Changes
-          </button>
-        </div>
+          </SubmitButton>
+        </form>
         <div className="flex flex-col space-y-4 col-span-8 lg:col-span-5">
           <h2 className="text-2xl font-bold">Mockup</h2>
           <div className="w-full flex flex-col space-y-4">
@@ -307,7 +331,7 @@ const DashboardPage = (props: DashboardPageProps) => {
                 </h3>
               </div>
             </div>
-            <div className="w-full border border-gray-300 rounded-lg p-4 space-y-4">
+            <div className="w-full border border-gray-300 rounded-lg p-4 space-y-4 flex flex-col">
               <div className="w-full flex justify-between items-center text-sm">
                 <h3>Example Layout</h3>
               </div>

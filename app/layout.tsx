@@ -20,22 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className}>
-      <body className="bg-gray-50 text-black relative">
-        {/* use the megapack hero as the background image  */}
-
-        <Image
-          src="/Tesla-Megapack-hero.webp"
-          alt="Tesla Megapack"
-          layout="fill"
-          objectFit="cover"
-          quality={100}
-          className="absolute inset-0 -z-10 bg-cover bg-center"
-        />
-
-        <main className="min-h-screen flex flex-col items-center max-w-2xl mx-auto">
-          {children}
-        </main>
-      </body>
+      <body className="bg-gray-50 text-black relative">{children}</body>
     </html>
   );
 }
