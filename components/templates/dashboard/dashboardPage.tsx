@@ -1,40 +1,45 @@
 "use client";
 import BATTERIES, { Battery } from "@/components/devices/batteries";
+import { User } from "@supabase/supabase-js";
 import { useState } from "react";
 
-interface DashboardPageProps {}
+interface DashboardPageProps {
+  user: User;
+  initialLayout?: SelectedBatteries[];
+}
 
 interface SelectedBatteries {
   id: number;
   quantity: number;
 }
 
+const DEFAULT_LAYOUT: SelectedBatteries[] = [
+  {
+    id: 1,
+    quantity: 0,
+  },
+  {
+    id: 2,
+    quantity: 0,
+  },
+  {
+    id: 3,
+    quantity: 0,
+  },
+  {
+    id: 4,
+    quantity: 0,
+  },
+  {
+    id: 5,
+    quantity: 0,
+  },
+];
+
 const DashboardPage = (props: DashboardPageProps) => {
-  const {} = props;
-  const [selectedBatteries, setSelectedBatteries] = useState<
-    SelectedBatteries[]
-  >([
-    {
-      id: 1,
-      quantity: 0,
-    },
-    {
-      id: 2,
-      quantity: 0,
-    },
-    {
-      id: 3,
-      quantity: 0,
-    },
-    {
-      id: 4,
-      quantity: 0,
-    },
-    {
-      id: 5,
-      quantity: 0,
-    },
-  ]);
+  const { user, initialLayout = DEFAULT_LAYOUT } = props;
+  const [selectedBatteries, setSelectedBatteries] =
+    useState<SelectedBatteries[]>(initialLayout);
 
   const calculateLandDimension = () => {
     const totalWidth = selectedBatteries.reduce(
@@ -52,15 +57,13 @@ const DashboardPage = (props: DashboardPageProps) => {
   };
 
   const generateBatteryLayout = (selectedBatteries: SelectedBatteries[]) => {
-    // Create a map to get battery details by id
-    const batteryMap = new Map<number, Battery>(
-      BATTERIES.map((battery) => [battery.id, battery])
-    );
-
     // Flatten the list of selected batteries into individual battery units
     let batteryUnits: Battery[] = [];
     selectedBatteries.forEach((selectedBattery) => {
-      const battery = batteryMap.get(selectedBattery.id);
+      const battery = BATTERIES.find(
+        (battery) => battery.id === selectedBattery.id
+      );
+
       if (battery) {
         for (let i = 0; i < selectedBattery.quantity; i++) {
           batteryUnits.push(battery);
@@ -120,20 +123,22 @@ const DashboardPage = (props: DashboardPageProps) => {
     );
   };
 
-  const batteryCount = selectedBatteries
-    .filter((selectedBattery) => selectedBattery.id !== 5)
-    .reduce((acc, selectedBattery) => acc + selectedBattery.quantity, 0);
+  const saveSession = async (userId: string, layout: SelectedBatteries[]) => {
+    const response = await fetch("/api/session/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId, layout }),
+    });
 
-  const transformerCount =
-    selectedBatteries.find((selectedBattery) => selectedBattery.id === 5)
-      ?.quantity || 0;
-
-  const requiredTransformers = Math.floor(batteryCount / 2);
+    return response.json();
+  };
 
   return (
     <div className="flex flex-col w-full space-y-4">
-      <div className="grid grid-cols-8 gap-16">
-        <div className="flex flex-col space-y-4 col-span-3">
+      <div className="grid grid-cols-8 gap-8 lg:gap-16">
+        <div className="flex flex-col space-y-4 col-span-8 lg:col-span-3">
           <div className="w-full flex justify-between items-center text-sm">
             <h2 className="text-2xl font-bold">Battery Selection</h2>
             <button
@@ -157,12 +162,6 @@ const DashboardPage = (props: DashboardPageProps) => {
                 <div className="flex flex-col">
                   <div className="w-full flex items-center space-x-2">
                     <p className="font-bold">{battery.name}</p>
-                    {battery.id === 5 &&
-                      transformerCount < requiredTransformers && (
-                        <p className="text-sm text-red-500">
-                          ({requiredTransformers} total required)
-                        </p>
-                      )}
                   </div>
 
                   <div className="flex flex-wrap gap-1 text-gray-600 text-sm items-center">
@@ -201,6 +200,32 @@ const DashboardPage = (props: DashboardPageProps) => {
                           id: battery.id,
                           quantity: value,
                         };
+
+                        // ensure that the transformer count is always half of the battery count
+                        const batteryCount = newSelectedBatteries
+                          .filter((selectedBattery) => selectedBattery.id !== 5)
+                          .reduce(
+                            (acc, selectedBattery) =>
+                              acc + selectedBattery.quantity,
+                            0
+                          );
+
+                        const transformerCount =
+                          newSelectedBatteries.find(
+                            (selectedBattery) => selectedBattery.id === 5
+                          )?.quantity || 0;
+
+                        const requiredTransformers = Math.floor(
+                          batteryCount / 2
+                        );
+
+                        if (transformerCount < requiredTransformers) {
+                          newSelectedBatteries[4] = {
+                            id: 5,
+                            quantity: requiredTransformers,
+                          };
+                        }
+
                         return newSelectedBatteries;
                       });
                     }}
@@ -210,11 +235,20 @@ const DashboardPage = (props: DashboardPageProps) => {
               </div>
             ))}
           </div>
+
+          <button
+            className="py-2 px-4 text-sm flex rounded-md no-underline bg-inherit hover:bg-gray-200 border border-gray-300 text-black font-semibold justify-center"
+            onClick={() => {
+              saveSession(user.id, selectedBatteries);
+            }}
+          >
+            Save Changes
+          </button>
         </div>
-        <div className="flex flex-col space-y-4 col-span-5">
+        <div className="flex flex-col space-y-4 col-span-8 lg:col-span-5">
           <h2 className="text-2xl font-bold">Mockup</h2>
-          <div className="w-full flex flex-col space-y-4 col-span-5">
-            <div className="grid grid-cols-3 gap-4">
+          <div className="w-full flex flex-col space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="border border-gray-300 rounded-lg p-4 flex flex-col col-span-1 space-y-2">
                 <div className="flex w-full justify-between text-sm">
                   <p>Budget</p>
