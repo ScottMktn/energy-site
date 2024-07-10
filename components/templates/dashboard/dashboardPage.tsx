@@ -59,6 +59,8 @@ const DashboardPage: React.FC<DashboardPageProps> = (
   };
 
   const generateBatteryLayout = (selectedBatteries: SelectedBatteries[]) => {
+    // Uses a Greedy Algorithm to attempt to fit the batteries into a grid if there is space
+
     // Flatten the list of selected batteries into individual battery units
     let batteryUnits: Battery[] = [];
     selectedBatteries.forEach((selectedBattery) => {
@@ -101,9 +103,9 @@ const DashboardPage: React.FC<DashboardPageProps> = (
             </div>
           );
           currentRowWidth += battery.width;
-          batteryUnits.splice(i, 1); // Remove the battery from the list
+          batteryUnits.splice(i, 1); // remove it
           addedToRow = true;
-          break; // Exit the loop to start checking from the largest battery again
+          break; // Exit the loop and use the next largest battery
         }
       }
 
@@ -139,12 +141,11 @@ const DashboardPage: React.FC<DashboardPageProps> = (
       body: JSON.stringify({ userId, layout }),
     });
 
-    // if its a 200, send a success message to the user
-    if (response.status !== 200) {
-      alert("Failed to save session");
-    }
-
-    alert("Successfully saved session");
+    alert(
+      response.status !== 200
+        ? "Failed to save session"
+        : "Successfully saved session"
+    );
 
     return response.json();
   };
