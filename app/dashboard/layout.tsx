@@ -32,7 +32,7 @@ export default function RootLayout({
 
   return (
     <>
-      <nav className="flex w-full border-b border-gray-300 justify-between max-w-7xl mx-auto items-center px-4 py-4">
+      <nav className="flex w-full border-b border-gray-300 justify-between max-w-7xl mx-auto items-center px-4 py-2">
         <div className="flex items-center space-x-2">
           <Image src="/image.png" alt="PowerPlan Logo" width={16} height={16} />
           <a href="/" className="font-bold">
