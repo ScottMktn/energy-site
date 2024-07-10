@@ -2,7 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./dashboard/submit-button";
+import { SubmitButton } from "../components/templates/dashboard/submit-button";
 
 export default function Home({
   searchParams,
@@ -65,7 +65,7 @@ export default function Home({
 
       <div className="flex-1 flex flex-col w-full px-4 md:px-8 sm:max-w-xl justify-center gap-2">
         <form className="flex-1 flex flex-col w-full justify-center gap-2 text-black">
-          <label className="text-md" htmlFor="email">
+          <label className="text-sm" htmlFor="email">
             Email
           </label>
           <input
@@ -74,7 +74,7 @@ export default function Home({
             placeholder="you@example.com"
             required
           />
-          <label className="text-md" htmlFor="password">
+          <label className="text-sm" htmlFor="password">
             Password
           </label>
           <input
