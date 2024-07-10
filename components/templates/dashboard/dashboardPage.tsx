@@ -3,7 +3,7 @@ import BATTERIES, { Battery } from "@/components/devices/batteries";
 import clsx from "@/utils/helpers/clsx";
 import { User } from "@supabase/supabase-js";
 import { useState } from "react";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "../../shared/SubmitButton";
 
 interface DashboardPageProps {
   user: User;

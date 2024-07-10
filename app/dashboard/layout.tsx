@@ -1,7 +1,6 @@
-import { GeistSans } from "geist/font/sans";
 import Image from "next/image";
-import AuthButton from "@/components/AuthButton";
 import { createClient } from "@/utils/supabase/server";
+import AuthButton from "@/components/shared/AuthButton";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`

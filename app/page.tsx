@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "../components/templates/dashboard/submit-button";
+import { SubmitButton } from "../components/shared/SubmitButton";
 import Image from "next/image";
 
 export default function Home({
