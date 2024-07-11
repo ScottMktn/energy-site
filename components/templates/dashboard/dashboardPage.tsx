@@ -165,7 +165,7 @@ const DashboardPage: React.FC<DashboardPageProps> = (
       <div className="grid grid-cols-8 gap-8 lg:gap-16">
         <form className="flex flex-col space-y-4 col-span-8 lg:col-span-3">
           <div className="w-full flex justify-between items-center text-sm">
-            <h2 className="text-2xl font-bold">Battery Selection</h2>
+            <h2 className="text-xl font-bold">Battery Selection</h2>
             <button
               type="button"
               className="underline"
@@ -253,7 +253,7 @@ const DashboardPage: React.FC<DashboardPageProps> = (
           </SubmitButton>
         </form>
         <div className="flex flex-col space-y-4 col-span-8 lg:col-span-5">
-          <h2 className="text-2xl font-bold">Mockup</h2>
+          <h2 className="text-xl font-bold">Mockup</h2>
           <div className="w-full flex flex-col space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="border border-gray-300 rounded-lg p-4 flex flex-col col-span-1 space-y-2">
