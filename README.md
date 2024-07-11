@@ -58,3 +58,10 @@ You can view a fully working demo at [https://energy-site.vercel.app/](https://e
    ```bash
    npm test
    ```
+
+## Features I would add to extend PowerPlan
+
+- Move Battery object to my database so we could add, edit, and delete different batteries. Currently, this is hard coded in the web app.
+- Randomize different layouts depending on constraints
+- Save sessions as individual sessions. Allows for comparisons of different plans
+- Configure constraints (50m, 200m, budget caps, etc.)
