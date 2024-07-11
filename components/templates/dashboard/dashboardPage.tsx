@@ -7,7 +7,10 @@ import { SubmitButton } from "../../shared/SubmitButton";
 import { calculateTotalDimensions } from "@/utils/helpers/calculateDimensions";
 import { calculateTotalBudget } from "@/utils/helpers/calculateBudget";
 import { calculateTotalEnergy } from "@/utils/helpers/calculateEnergy";
-import { updateBatteries } from "@/utils/helpers/updateBatteries";
+import {
+  getRequiredTransformers,
+  updateBatteries,
+} from "@/utils/helpers/updateBatteries";
 
 interface DashboardPageProps {
   user: User;
@@ -150,6 +153,13 @@ const DashboardPage: React.FC<DashboardPageProps> = (
     return response.json();
   };
 
+  const batteriesSelected = selectedBatteries.reduce(
+    (acc, selectedBattery) => acc + selectedBattery.quantity,
+    0
+  );
+
+  const requiredTransformers = getRequiredTransformers(selectedBatteries);
+
   return (
     <div className="flex flex-col w-full space-y-4">
       <div className="grid grid-cols-8 gap-8 lg:gap-16">
@@ -185,6 +195,11 @@ const DashboardPage: React.FC<DashboardPageProps> = (
                   <div className="flex flex-col">
                     <div className="w-full flex items-center space-x-2">
                       <p className="font-bold">{battery.name}</p>
+                      {battery.id === 5 && requiredTransformers > 0 && (
+                        <p className="text-xs text-gray-500">
+                          ({requiredTransformers} required)
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap gap-1 text-gray-600 text-sm items-center">
@@ -273,7 +288,25 @@ const DashboardPage: React.FC<DashboardPageProps> = (
               <div className="w-full flex justify-between items-center text-sm">
                 <h3>Example Layout</h3>
               </div>
-              {generateBatteryLayout(selectedBatteries)}
+              {batteriesSelected === 0 ? (
+                <div className="flex flex-col space-y-4 w-full items-center justify-center h-48">
+                  <div className="grid grid-cols-8 gap-4 w-full max-w-sm">
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-3" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-2" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-3" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-4" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-2" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-1" />
+                    <div className="rounded-sm h-8 items-center flex justify-center text-sm bg-gray-300 col-span-1" />
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    No batteries selected. Please select batteries to generate
+                    an example layout.
+                  </p>
+                </div>
+              ) : (
+                generateBatteryLayout(selectedBatteries)
+              )}
             </div>
           </div>
         </div>

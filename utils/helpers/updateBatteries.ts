@@ -1,6 +1,23 @@
 // utils/helpers/updateBatteries.ts
 import { SelectedBatteries } from "@/components/templates/dashboard/dashboardPage";
 
+export function getRequiredTransformers(
+  selectedBatteries: SelectedBatteries[]
+) {
+  const batteryCount = selectedBatteries.filter(
+    (selectedBattery) => selectedBattery.id !== 5
+  );
+
+  const requiredTransformers = Math.floor(
+    batteryCount.reduce(
+      (acc, selectedBattery) => acc + selectedBattery.quantity,
+      0
+    ) / 2
+  );
+
+  return requiredTransformers;
+}
+
 export function updateBatteries(
   selectedBatteries: SelectedBatteries[],
   batteryId: number,
@@ -15,16 +32,11 @@ export function updateBatteries(
     quantity,
   };
 
-  // Ensure that the transformer count is always half of the battery count
-  const batteryCount = newSelectedBatteries
-    .filter((selectedBattery) => selectedBattery.id !== 5)
-    .reduce((acc, selectedBattery) => acc + selectedBattery.quantity, 0);
-
   const transformerCount =
     newSelectedBatteries.find((selectedBattery) => selectedBattery.id === 5)
       ?.quantity || 0;
 
-  const requiredTransformers = Math.floor(batteryCount / 2);
+  const requiredTransformers = getRequiredTransformers(newSelectedBatteries);
 
   if (transformerCount < requiredTransformers) {
     const transformerIndex = newSelectedBatteries.findIndex(
