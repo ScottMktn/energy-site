@@ -45,7 +45,9 @@ export default function Home({
     });
 
     if (error) {
-      return redirect("/?message=Could not authenticate user");
+      return redirect(
+        `/?message=Could not authenticate user: ${error.message}`
+      );
     }
 
     return redirect("/?message=Check email to continue sign in process");
